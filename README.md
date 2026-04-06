@@ -28,7 +28,7 @@ output will be in the /dist
 
 ---
 <img src="http://cdn.aesth.cc/img/NVIDIA_Overlay_ZJ9heNHT6O.png">
-http://cdn.aesth.cc/img/NVIDIA_Overlay_ZJ9heNHT6O.png
+
 ---
 
 ## cool system showcase
