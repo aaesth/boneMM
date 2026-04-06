@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; img-src https: data: 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+  <title>boneMM dirty build 4/6/26</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="startup-overlay" class="startup-overlay">
+    <div class="startup-text">boneMM build 4/6/26</div>
+  </div>
+  <div id="app">
+
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="game-title">BONELAB</div>
+        <p>build 4626-dev-MMC-debug</p>
+      </div>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">MODS</div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="installed">
+          <span class="nav-icon">📁</span> Installed
+          <span class="nav-badge" id="installed-badge" style="display:none">0</span>
+        </button>
+        <button class="nav-item" data-view="updates">
+          <span class="nav-icon">↑</span> Updates
+          <span class="nav-badge" id="updates-badge" style="display:none;background:var(--yellow);color:#111">0</span>
+        </button>
+        <button class="nav-item" data-view="online">
+          <span class="nav-icon">🌐</span> Online
+          <span class="nav-count" id="online-count"></span>
+        </button>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">OTHER</div>
+      <nav class="sidebar-nav">
+        <button class="nav-item" data-view="profiles">
+          <span class="nav-icon">👤</span> Profiles
+        </button>
+        <button class="nav-item" data-view="settings">
+          <span class="nav-icon">⚙</span> Settings
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="status-bar">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-text">Ready</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="center">
+
+      <!-- Online -->
+      <div class="view" id="view-online">
+        <div class="center-toolbar">
+          <div class="search-wrap">
+            <input class="search-input" id="search-input" type="text" placeholder="Search" />
+          </div>
+          <button class="toolbar-btn" id="btn-sort">Sort</button>
+          <button class="toolbar-btn" id="btn-filter">Filter</button>
+        </div>
+        <div id="sort-dropdown" class="dropdown" style="display:none">
+          <button data-sort="popular">Popular</button>
+          <button data-sort="new">Newest</button>
+          <button data-sort="rating">Top Rated</button>
+          <button data-sort="downloads">Downloads</button>
+        </div>
+        <div id="filter-dropdown" class="dropdown filter-dd" style="display:none">
+          <div class="filter-header">Filter by tag</div>
+          <div id="filter-tag-list"></div>
+          <div class="filter-footer">
+            <button id="btn-clear-filter" class="filter-clear-btn">Clear filter</button>
+          </div>
+        </div>
+        <div id="api-warning" class="notice warning" style="display:none">
+          ⚠ Enter your mod.io API key in <span class="link" data-view="settings">Settings</span> to browse mods.
+        </div>
+        <div id="mod-list-wrap">
+          <div id="mod-list"></div>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+      <!-- Updates -->
+      <div class="view" id="view-updates">
+        <div class="center-toolbar">
+          <span class="view-title">Updates</span>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button class="toolbar-btn" id="btn-check-updates">↻ Check for updates</button>
+            <button class="toolbar-btn primary" id="btn-update-all" style="display:none">Update all</button>
+          </div>
+        </div>
+        <div id="updates-body" class="panel-scroll"></div>
+      </div>
+
+      <!-- Installed -->
+      <div class="view active" id="view-installed">
+        <div class="center-toolbar">
+          <span class="view-title">Installed mods</span>
+          <button class="toolbar-btn" id="btn-open-folder" style="margin-left:auto">Open folder</button>
+        </div>
+        <div id="installed-list" class="panel-scroll"></div>
+      </div>
+
+      <!-- Profiles -->
+      <div class="view" id="view-profiles">
+        <div class="center-toolbar">
+          <span class="view-title">Profiles</span>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button class="toolbar-btn primary" id="btn-new-profile">+ New profile</button>
+            <button class="toolbar-btn" id="btn-import-profile">Import code</button>
+          </div>
+        </div>
+        <div id="profiles-list" class="panel-scroll" style="padding:14px;display:flex;flex-direction:column;gap:10px">
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="view" id="view-settings">
+        <div class="center-toolbar"><span class="view-title">Settings</span></div>
+        <div class="settings-body">
+          <div class="settings-section">
+            <div class="settings-heading">mod.io API Key</div>
+            <div class="settings-sub">Get a free key at <a href="https://mod.io/me/access"
+                target="_blank">mod.io/me/access</a></div>
+            <div class="settings-row">
+              <input class="setting-input" id="api-key-field" type="password" placeholder="Enter API key…" />
+              <button class="toolbar-btn" id="btn-save-key">Save</button>
+              <button class="toolbar-btn" id="btn-test-key">Test</button>
+              if this shows "Connected -" but not "Connected - BONELAB" then the api key is wrong
+            </div>
+            <div id="conn-status" style="font-size:12px;margin-top:6px"></div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-heading">Mod Folder</div>
+            <div class="settings-sub">Default: %AppData%\..\LocalLow\Stress Level Zero\BONELAB\Mods</div>
+            <div class="settings-row">
+              <input class="setting-input" id="folder-field" readonly placeholder="Click Browse…" style="flex:1" />
+              <button class="toolbar-btn" id="btn-browse-folder">Browse…</button>
+              <button class="toolbar-btn" id="btn-open-folder2">Open ↗</button>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-heading">Game Executable</div>
+            <div class="settings-sub">Path to BONELAB.exe for the Launch button</div>
+            <div class="settings-row">
+              <input class="setting-input" id="exe-field" readonly placeholder="Click Browse…" style="flex:1" />
+              <button class="toolbar-btn" id="btn-browse-exe">Browse…</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <aside class="detail-panel">
+      <div class="detail-empty" id="detail-empty">
+        <div style="opacity:0.15;font-size:40px">🦴</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px">Select a mod to view details</div>
+      </div>
+      <div class="detail-content" id="detail-content" style="display:none"></div>
+    </aside>
+
+  </div>
+
+  <!-- Modal: Create profile -->
+  <div class="modal-overlay" id="modal-create-profile">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Create profile</div>
+        <button class="modal-close" data-close="modal-create-profile">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label class="modal-label">Profile name</label>
+          <input class="setting-input" id="new-profile-name" style="width:100%" placeholder="e.g. Guns Only…" />
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Description <span style="color:var(--muted)">(optional)</span></label>
+          <input class="setting-input" id="new-profile-desc" style="width:100%" placeholder="Brief description…" />
+        </div>
+        <div class="modal-field">
+          <label class="modal-checkbox-row">
+            <input type="checkbox" id="profile-snapshot-current" checked />
+            <span>Snapshot current installed mods (<span id="snapshot-count">0</span>)</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="toolbar-btn primary" id="btn-create-profile">Create profile</button>
+        <button class="toolbar-btn" data-close="modal-create-profile">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Share profile -->
+  <div class="modal-overlay" id="modal-share-profile">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header">
+        <div class="modal-title" id="share-modal-title">Share profile</div>
+        <button class="modal-close" data-close="modal-share-profile">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label class="modal-label">Share code</label>
+          <div class="modal-sub">Send this to anyone — they can paste it into Import</div>
+          <div class="share-code-wrap">
+            <textarea class="share-code-box" id="share-code-text" readonly></textarea>
+            <button class="copy-btn" id="btn-copy-code">Copy</button>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Mods in this profile</label>
+          <div id="share-mod-list" class="share-mod-list"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="toolbar-btn" id="btn-export-file">Save as file…</button>
+        <button class="toolbar-btn" data-close="modal-share-profile">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Import profile -->
+  <div class="modal-overlay" id="modal-import-profile">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header">
+        <div class="modal-title">Import profile</div>
+        <button class="modal-close" data-close="modal-import-profile">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label class="modal-label">Paste share code</label>
+          <textarea class="share-code-box" id="import-code-text" placeholder="Paste a boneMM profile code here…"
+            style="height:100px"></textarea>
+        </div>
+        <div id="import-preview" style="display:none;font-size:12px;color:var(--muted)"></div>
+        <div id="import-error" class="notice warning" style="display:none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="toolbar-btn primary" id="btn-do-import">Import profile</button>
+        <button class="toolbar-btn" data-close="modal-import-profile">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+{
+  "name": "bonemm",
+  "version": "1.0.0dev",
+  "author": "aesth",
+  "description": "boneMM",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "cc.aesth.bonemm",
+    "productName": "boneMM",
+    "extraResources": [
+      {
+        "from": "src/assets/startup.wav",
+        "to": "assets/startup.wav"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "axios": "^1.6.0",
+    "electron-store": "^8.1.0",
+    "node-fetch": "^2.7.0",
+    "node-wav-player": "^1.0.0"
+  }
+}
